@@ -13,7 +13,7 @@ func TestCalc(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if want := 3670016.00; got != want {
+		if want := 11264.00; got != want {
 			t.Errorf("got: %v, want: %v", got, want)
 		}
 	})
@@ -23,7 +23,7 @@ func TestCalc(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if want := 3584.00; got != want {
+		if want := 11.00; got != want {
 			t.Errorf("got: %v, want: %v", got, want)
 		}
 	})
@@ -33,7 +33,7 @@ func TestCalc(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if want := 3.50; got != want {
+		if want := 0.01; got != want {
 			t.Errorf("got: %v, want: %v", got, want)
 		}
 	})
@@ -48,12 +48,22 @@ func TestCalc(t *testing.T) {
 
 func TestOptionFunc(t *testing.T) {
 	const root = "./testdata"
-	t.Run("case=ignore", func(t *testing.T) {
-		got, err := Calc(root, B, Ignore("ignore_*"))
+	t.Run("case=IgnoreFile/IgnoreDir", func(t *testing.T) {
+		got, err := Calc(root, B, IgnoreFile("ignore_*"), IgnoreDir("ignore"))
 		if err != nil {
 			t.Fatal(err)
 		}
-		if want := 2621440.00; got != want {
+		if want := 3072.00; got != want {
+			t.Errorf("got: %v, want: %v", got, want)
+		}
+	})
+
+	t.Run("case=Ignore", func(t *testing.T) {
+		got, err := Calc(root, B, Ignore("ignore*"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if want := 3072.00; got != want {
 			t.Errorf("got: %v, want: %v", got, want)
 		}
 	})

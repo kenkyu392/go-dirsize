@@ -26,16 +26,16 @@ func Calc(root string, u ByteUnit, opts ...OptionFunc) (float64, error) {
 		if err != nil {
 			return err
 		}
-		if !info.IsDir() {
-			for _, opt := range opts {
-				switch err := opt(path, info, err); err {
-				case nil:
-				case SkipFile:
-					return nil
-				default:
-					return err
-				}
+		for _, opt := range opts {
+			switch err := opt(path, info, err); err {
+			case nil:
+			case SkipFile:
+				return nil
+			default:
+				return err
 			}
+		}
+		if !info.IsDir() {
 			size += info.Size()
 		}
 		return nil
@@ -57,6 +57,29 @@ type OptionFunc filepath.WalkFunc
 func Ignore(pattern string) OptionFunc {
 	return func(path string, info fs.FileInfo, err error) error {
 		if matched, _ := filepath.Match(pattern, info.Name()); matched {
+			if info.IsDir() {
+				return fs.SkipDir
+			}
+			return SkipFile
+		}
+		return nil
+	}
+}
+
+// IgnoreDir ...
+func IgnoreDir(pattern string) OptionFunc {
+	return func(path string, info fs.FileInfo, err error) error {
+		if matched, _ := filepath.Match(pattern, info.Name()); info.IsDir() && matched {
+			return fs.SkipDir
+		}
+		return nil
+	}
+}
+
+// IgnoreFile ...
+func IgnoreFile(pattern string) OptionFunc {
+	return func(path string, info fs.FileInfo, err error) error {
+		if matched, _ := filepath.Match(pattern, info.Name()); !info.IsDir() && matched {
 			return SkipFile
 		}
 		return nil
